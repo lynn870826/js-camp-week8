@@ -11,6 +11,7 @@ const { validateCartQuantity, formatCurrency } = require('../utils');
  */
 async function getCart() {
   // 請實作此函式
+  // 提示：呼叫 fetchCart() 取得購物車資料並回傳
 }
 
 /**
@@ -21,7 +22,9 @@ async function getCart() {
  */
 async function addProductToCart(productId, quantity) {
   // 請實作此函式
-  // 提示：先驗證數量，再呼叫 API
+  // 提示：先用 utils validateCartQuantity() 驗證數量，驗證失敗時回傳 { success: false, error: ... }
+  // 驗證通過後，呼叫 addToCart() 加入購物車
+  // 使用 try/catch 處理錯誤，回傳格式：{ success: true, data: ... } / { success: false, error: ... }
 }
 
 /**
@@ -32,6 +35,9 @@ async function addProductToCart(productId, quantity) {
  */
 async function updateProduct(cartId, quantity) {
   // 請實作此函式
+  // 提示：先用 utils validateCartQuantity() 驗證數量，驗證失敗時回傳 { success: false, error: ... }
+  // 驗證通過後，呼叫 updateCartItem() 更新數量
+  // 使用 try/catch 處理錯誤，回傳格式：{ success: true, data: ... } / { success: false, error: ... }
 }
 
 /**
@@ -41,6 +47,8 @@ async function updateProduct(cartId, quantity) {
  */
 async function removeProduct(cartId) {
   // 請實作此函式
+  // 提示：呼叫 deleteCartItem()，使用 try/catch 處理錯誤
+  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
 }
 
 /**
@@ -49,6 +57,8 @@ async function removeProduct(cartId) {
  */
 async function emptyCart() {
   // 請實作此函式
+  // 提示：呼叫 clearCart()，使用 try/catch 處理錯誤
+  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
 }
 
 /**
@@ -57,7 +67,8 @@ async function emptyCart() {
  */
 async function getCartTotal() {
   // 請實作此函式
-  // 回傳 { total, finalTotal, itemCount }
+  // 提示：呼叫 fetchCart() 取得購物車資料
+  // 回傳格式：{ total: 原始金額, finalTotal: 折扣後金額, itemCount: 商品筆數 }
 }
 
 /**
@@ -66,7 +77,19 @@ async function getCartTotal() {
  */
 function displayCart(cart) {
   // 請實作此函式
-  // 提示：格式化輸出購物車商品、數量、金額
+  // 提示：先判斷購物車是否為空（cart.carts 不存在或長度為 0），若空則輸出「購物車是空的」
+  // 會使用到 utils formatCurrency() 來格式化金額
+  //
+  // 預期輸出格式：
+  // 購物車內容：
+  // ----------------------------------------
+  // 1. 產品名稱
+  //    數量：2
+  //    單價：NT$ 800
+  //    小計：NT$ 1,600
+  // ----------------------------------------
+  // 商品總計：NT$ 1,600
+  // 折扣後金額：NT$ 1,600
 }
 
 module.exports = {

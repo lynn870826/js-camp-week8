@@ -3,7 +3,7 @@
 // ========================================
 
 const { fetchProducts } = require('../api');
-const { getDiscountRate, getAllCategories } = require('../utils');
+const { getDiscountRate, getAllCategories, formatCurrency } = require('../utils');
 
 /**
  * 取得所有產品
@@ -11,7 +11,8 @@ const { getDiscountRate, getAllCategories } = require('../utils');
  */
 async function getProducts() {
   // 請實作此函式
-  // 提示：使用 fetchProducts() 取得產品，並格式化回傳
+  // 提示：使用 fetchProducts() 取得產品陣列
+  // 回傳格式：{ products, count: 產品數量 }
 }
 
 /**
@@ -21,6 +22,8 @@ async function getProducts() {
  */
 async function getProductsByCategory(category) {
   // 請實作此函式
+  // 提示：使用 fetchProducts() 取得所有產品後，篩選出符合 category 的產品
+  // 回傳格式：篩選後的產品陣列
 }
 
 /**
@@ -30,14 +33,17 @@ async function getProductsByCategory(category) {
  */
 async function getProductById(productId) {
   // 請實作此函式
+  // 提示：使用 fetchProducts() 取得所有產品後，找出 id 符合的產品
+  // 若找不到，回傳 null
 }
 
 /**
- * 取得所有分類
+ * 取得所有分類（不重複）
  * @returns {Promise<Array>}
  */
 async function getCategories() {
   // 請實作此函式
+  // 提示：使用 fetchProducts() 取得所有產品後，以及 utils getAllCategories()
 }
 
 /**
@@ -46,7 +52,17 @@ async function getCategories() {
  */
 function displayProducts(products) {
   // 請實作此函式
-  // 提示：格式化輸出產品名稱、價格、折扣等資訊
+  // 提示：使用 forEach 遍歷產品陣列，依序輸出每筆產品資訊
+  // 使用 utils getDiscountRate() 計算折扣率，以及 utils formatCurrency() 格式化金額
+  //
+  // 預期輸出格式：
+  // 產品列表：
+  // ----------------------------------------
+  // 1. 產品名稱
+  //    分類：xxx
+  //    原價：NT$ 1,000
+  //    售價：NT$ 800 (8折)
+  // ----------------------------------------
 }
 
 module.exports = {
