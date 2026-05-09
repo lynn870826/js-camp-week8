@@ -11,10 +11,16 @@ const { validateOrderUser, formatDate, getDaysAgo, formatCurrency } = require('.
  * @returns {Promise<Object>}
  */
 async function placeOrder(userInfo) {
-  // 請實作此函式
-  // 提示：先用 utils validateOrderUser() 驗證使用者資料，驗證失敗時回傳 { success: false, errors: [...] }
-  // 驗證通過後，呼叫 createOrder() 建立訂單
-  // 回傳格式：{ success: true, data: ... } / { success: false, errors: [...] }
+    const validationResult = validateOrderUser(userInfo);
+  if (!validationResult.isValid) {
+    return { success: false, errors: validationResult.errors };
+  }
+  try {
+    const orderData = await createOrder(userInfo);
+    return { success: true, data: orderData };
+  } catch (error) {
+    return { success: false, errors: [error.message] };
+  } 
 }
 
 /**
@@ -22,8 +28,8 @@ async function placeOrder(userInfo) {
  * @returns {Promise<Array>}
  */
 async function getOrders() {
-  // 請實作此函式
-  // 提示：呼叫 fetchOrders() 取得訂單陣列並回傳
+    const orders = await fetchOrders();
+  return orders;
 }
 
 /**
@@ -31,8 +37,9 @@ async function getOrders() {
  * @returns {Promise<Array>}
  */
 async function getUnpaidOrders() {
-  // 請實作此函式
-  // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 false 的訂單
+    const orders = await fetchOrders();
+  const unpaidOrders = orders.filter(order => !order.paid);
+  return unpaidOrders;
 }
 
 /**
@@ -40,8 +47,9 @@ async function getUnpaidOrders() {
  * @returns {Promise<Array>}
  */
 async function getPaidOrders() {
-  // 請實作此函式
-  // 提示：呼叫 fetchOrders() 後，篩選出 paid 為 true 的訂單
+    const orders = await fetchOrders();
+  const paidOrders = orders.filter(order => order.paid);
+  return paidOrders;
 }
 
 /**
@@ -51,9 +59,12 @@ async function getPaidOrders() {
  * @returns {Promise<Object>}
  */
 async function updatePaymentStatus(orderId, isPaid) {
-  // 請實作此函式
-  // 提示：呼叫 updateOrderStatus()
-  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  try {
+    const response = await updateOrderStatus(orderId, isPaid);
+    return { success: true, data: response };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
 
 /**
@@ -62,9 +73,12 @@ async function updatePaymentStatus(orderId, isPaid) {
  * @returns {Promise<Object>}
  */
 async function removeOrder(orderId) {
-  // 請實作此函式
-  // 提示：呼叫 deleteOrder()
-  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  try {   
+    const response = await deleteOrder(orderId);
+    return { success: true, data: response };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
 
 /**
@@ -84,7 +98,17 @@ async function removeOrder(orderId) {
  * - daysAgo: 距離今天為幾天前，使用 utils getDaysAgo()
  */
 function formatOrder(order) {
-  // 請實作此函式
+    return {
+    id: order.id,
+    user: order.user,
+    products: order.products,
+    total: order.total,
+    totalFormatted: formatCurrency(order.total),
+    paid: order.paid,
+    paidText: order.paid ? '已付款' : '未付款',
+    createdAt: formatDate(order.createdAt),
+    daysAgo: getDaysAgo(order.createdAt)
+  };
 }
 
 /**
@@ -92,6 +116,14 @@ function formatOrder(order) {
  * @param {Array} orders - 訂單陣列
  */
 function displayOrders(orders) {
+    if (orders.length === 0) {
+    console.log('沒有訂單');
+    return;
+  }
+  console.log('訂單列表：');
+  console.log('========================================');
+  console.log(orders.map(formatOrder).join('\n----------------------------------------\n'));
+  console.log('========================================');
   // 請實作此函式
   // 提示：先判斷訂單陣列是否為空，若空則輸出「沒有訂單」
   // 使用 formatOrder() 格式化每筆訂單後再輸出

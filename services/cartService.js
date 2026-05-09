@@ -10,8 +10,8 @@ const { validateCartQuantity, formatCurrency } = require('../utils');
  * @returns {Promise<Object>}
  */
 async function getCart() {
-  // 請實作此函式
-  // 提示：呼叫 fetchCart() 取得購物車資料並回傳
+  const cartData = await fetchCart();
+  return cartData;
 }
 
 /**
@@ -21,11 +21,24 @@ async function getCart() {
  * @returns {Promise<Object>}
  */
 async function addProductToCart(productId, quantity) {
-  // 請實作此函式
-  // 提示：先用 utils validateCartQuantity() 驗證數量，驗證失敗時回傳 { success: false, error: ... }
-  // 驗證通過後，呼叫 addToCart() 加入購物車
-  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const quantityValidation = validateCartQuantity(quantity);
+  if (!quantityValidation.isValid) {
+    return { success: false, error: quantityValidation.error };
+  }
+  try {
+    const cartData = await addToCart(productId, quantity);
+    return { success: true, data: cartData };
+  } catch (error) {
+    return { success: false, error: error.message };
+  } 
+  const response = await axios.post(`${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts`, {
+    productId,
+    quantity
+  });
+  return { success: true, data: response.data };
 }
+
+
 
 /**
  * 更新購物車商品數量
@@ -34,10 +47,20 @@ async function addProductToCart(productId, quantity) {
  * @returns {Promise<Object>}
  */
 async function updateProduct(cartId, quantity) {
-  // 請實作此函式
-  // 提示：先用 utils validateCartQuantity() 驗證數量，驗證失敗時回傳 { success: false, error: ... }
-  // 驗證通過後，呼叫 updateCartItem() 更新數量
-  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  const quantityValidation = validateCartQuantity(quantity);
+  if (!quantityValidation.isValid) {
+    return { success: false, error: quantityValidation.error };
+  } 
+  try {
+    const cartData = await updateCartItem(cartId, quantity);
+    return { success: true, data: cartData };
+  } catch (error) {
+    return { success: false, error: error.message };
+  } 
+  const response = await axios.put(`${BASE_URL}/api/livejs/v1/customer/${API_PATH}/carts/${cartId}`, {
+    quantity
+  }); 
+  return { success: true, data: response.data };
 }
 
 /**
@@ -46,9 +69,12 @@ async function updateProduct(cartId, quantity) {
  * @returns {Promise<Object>}
  */
 async function removeProduct(cartId) {
-  // 請實作此函式
-  // 提示：呼叫 deleteCartItem()
-  // 回傳格式：{ success: true, data: ... } / { success: false, error: ... }
+  try {
+    const cartData = await deleteCartItem(cartId);
+    return { success: true, data: cartData };
+  } catch (error) {
+    return { success: false, error: error.message };
+  } 
 }
 
 /**
@@ -56,6 +82,8 @@ async function removeProduct(cartId) {
  * @returns {Promise<Object>}
  */
 async function emptyCart() {
+    const response = await clearCart();
+  return { success: true, data: response };
   // 請實作此函式
   // 提示：呼叫 clearCart()
   // 回傳格式：{ success: true, data: ... } 
@@ -66,9 +94,8 @@ async function emptyCart() {
  * @returns {Promise<Object>}
  */
 async function getCartTotal() {
-  // 請實作此函式
-  // 提示：呼叫 fetchCart() 取得購物車資料
-  // 回傳格式：{ total: 原始金額, finalTotal: 折扣後金額, itemCount: 商品筆數 }
+    const cartData = await fetchCart();
+  return { total: cartData.total, finalTotal: cartData.finalTotal, itemCount: cartData.carts ? cartData.carts.length : 0 };
 }
 
 /**
@@ -76,6 +103,22 @@ async function getCartTotal() {
  * @param {Object} cart - 購物車資料
  */
 function displayCart(cart) {
+  const carts = cart.carts || [];
+  if (carts.length === 0) {
+    console.log('購物車是空的');
+    return;
+  }
+  console.log('購物車內容：');
+  console.log('----------------------------------------');
+  carts.forEach((item, index) => {
+    console.log(`${index + 1}. ${item.product.title}`);
+    console.log(`   數量：${item.quantity}`);
+    console.log(`   單價：${formatCurrency(item.product.price)}`);
+    console.log(`   小計：${formatCurrency(item.quantity * item.product.price)}`);
+    console.log('----------------------------------------');
+  });
+  console.log(`商品總計：${formatCurrency(cart.total)}`);
+  console.log(`折扣後金額：${formatCurrency(cart.finalTotal)}`);  
   // 請實作此函式
   // 提示：先判斷購物車是否為空（cart.carts 不存在或長度為 0），若空則輸出「購物車是空的」
   // 會使用到 utils formatCurrency() 來格式化金額
